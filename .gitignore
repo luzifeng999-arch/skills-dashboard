@@ -1,0 +1,5 @@
+node_modules/  
+*.ps1  
+server.js  
+skills_data.json  
+index.html 
