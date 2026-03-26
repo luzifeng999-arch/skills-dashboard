@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Skills Dashboard · luzifeng</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f4f8;--surface:#fff;--surface2:#f7fafc;
+  --border:#e2e8f0;--border2:#cbd5e0;
+  --text:#1a202c;--text2:#4a5568;--text3:#718096;--text4:#a0aec0;
+  --accent:#5a67d8;--accent-bg:#ebf4ff;
+  --r:14px;--rsm:8px;--rpill:100px;
+  --sh:0 1px 4px rgba(0,0,0,.06);--sh-h:0 6px 22px rgba(0,0,0,.09);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:"SF Mono","Fira Code","Cascadia Code",monospace;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;padding:40px 24px 70px}
+.wrap{max-width:1000px;margin:0 auto}
+
+/* Header */
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.hdr-icon{width:54px;height:54px;border-radius:15px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  display:flex;align-items:center;justify-content:center;font-size:27px;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(102,126,234,.38)}
+.hdr h1{font-size:25px;font-weight:700;letter-spacing:-.4px}
+.hdr p{font-size:13px;color:var(--text3);margin-top:3px}
+
+/* Stat pills */
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;align-items:center}
+.pill{background:var(--surface);border:1px solid var(--border);border-radius:var(--rpill);
+  padding:6px 14px;font-size:12.5px;color:var(--text2);display:flex;align-items:center;gap:6px;box-shadow:var(--sh)}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.refresh{margin-left:auto;display:flex;align-items:center;gap:6px;padding:6px 14px;
+  background:var(--accent-bg);border:1.5px solid var(--accent);border-radius:var(--rpill);
+  color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s}
+.refresh:hover{background:var(--accent);color:#fff}
+.refresh.spin svg{animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#lastUpdate{font-size:11px;color:var(--text4);margin-left:2px}
+
+/* Filter bar */
+.filters{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);
+  padding:16px 18px;margin-bottom:26px;box-shadow:var(--sh)}
+.frow{display:flex;gap:11px;flex-wrap:wrap;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:5px;flex:1;min-width:150px}
+.fg label{font-size:11px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.4px}
+.sw,.sel{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--rsm);
+  background:var(--surface2);font-size:13.5px;color:var(--text);outline:none;transition:.15s;font-family:var(--font)}
+.sw{padding-left:33px}
+.swrap{position:relative}
+.swrap .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text4);pointer-events:none}
+.sw:focus,.sel:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(90,103,216,.12)}
+.sel{cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23a0aec0' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center}
+.cbtn{padding:9px 14px;border-radius:var(--rsm);border:1.5px solid var(--border2);
+  background:var(--surface);color:var(--text3);font-size:13px;cursor:pointer;transition:.15s;flex-shrink:0}
+.cbtn:hover{border-color:var(--text2);color:var(--text)}
+
+/* Tag row */
+.tagrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px}
+.taglbl{font-size:11px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
+.tag{padding:4px 11px;border-radius:var(--rpill);border:1.5px solid var(--border);
+  background:var(--surface2);color:var(--text3);font-size:12px;cursor:pointer;transition:.15s}
+.tag:hover{border-color:var(--border2);color:var(--text2)}
+.tag.on{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:600}
+
+/* View bar */
+.vbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.rsummary{font-size:13px;color:var(--text3)}
+.rsummary strong{color:var(--text);font-weight:600}
+.vtog{display:flex;gap:3px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rsm);padding:3px}
+.vbtn{padding:5px 10px;border-radius:6px;border:none;background:transparent;
+  color:var(--text3);cursor:pointer;font-size:12.5px;transition:.15s;display:flex;align-items:center;gap:4px}
+.vbtn.on{background:var(--accent);color:#fff}
+
+/* Category section */
+.csec{margin-bottom:30px}
+.chdr{display:flex;align-items:center;gap:9px;margin-bottom:13px}
+.cbadge{font-size:12.5px;font-weight:700;padding:4px 12px;border-radius:var(--rpill)}
+.ccount{font-size:12px;color:var(--text4)}
+.cdiv{flex:1;height:1px;background:var(--border)}
+
+/* Grid / List */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:13px}
+.clist{display:flex;flex-direction:column;gap:8px}
+
+/* Skill card */
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);
+  padding:18px;display:flex;flex-direction:column;gap:11px;transition:.17s;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0}
+.card:hover{transform:translateY(-2px);box-shadow:var(--sh-h);border-color:var(--border2)}
+
+/* List card */
+.clist .card{flex-direction:row;align-items:center;gap:14px;padding:13px 16px}
+.clist .card::before{width:3px;height:100%;top:0;left:0;right:auto;border-radius:var(--r) 0 0 var(--r)}
+.clist .cbody{flex:1;min-width:0}
+.clist .skill-desc{-webkit-line-clamp:1}
+.clist .kws{display:none}
+.clist .cfoot{flex-direction:column;align-items:flex-end;flex-shrink:0}
+
+/* Card internals */
+.ctop{display:flex;align-items:flex-start;gap:11px}
+.sicon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.smeta{flex:1;min-width:0}
+.sname{font-size:14.5px;font-weight:700;color:var(--text);letter-spacing:-.2px;line-height:1.3}
+.sname-zh{font-size:13px;font-weight:400;color:var(--text3)}
+.sid{font-size:11px;font-family:var(--mono);color:var(--text4);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sver{font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--rpill);
+  background:var(--surface2);border:1px solid var(--border);color:var(--text3);white-space:nowrap;flex-shrink:0;align-self:flex-start;margin-top:2px}
+
+.cbody{display:flex;flex-direction:column;gap:8px}
+.skill-summary{font-size:13px;color:var(--text2);font-weight:500}
+.skill-desc{font-size:12.5px;color:var(--text3);line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kws{display:flex;gap:4px;flex-wrap:wrap}
+.kw{font-size:10px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 5px;color:var(--text3)}
+
+.cfoot{display:flex;align-items:center;justify-content:space-between;
+  padding-top:8px;border-top:1px solid var(--surface2);flex-wrap:wrap;gap:6px}
+.srcbadge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--rpill)}
+.src-internal{background:#ebf4ff;color:#3182ce}
+.src-extension{background:#faf5ff;color:#6b46c1}
+.src-project{background:#f0fff4;color:#276749}
+
+/* Category themes */
+[data-cat="Skill 管理"]      .card::before{background:linear-gradient(90deg,#667eea,#764ba2)}
+[data-cat="Skill 管理"]      .sicon{background:#ebf4ff}
+[data-cat="Skill 管理"]      .cbadge{background:#ebf4ff;color:#3182ce}
+
+[data-cat="产品帮助"]        .card::before{background:linear-gradient(90deg,#4fd1c5,#319795)}
+[data-cat="产品帮助"]        .sicon{background:#e6fffa}
+[data-cat="产品帮助"]        .cbadge{background:#e6fffa;color:#2c7a7b}
+
+[data-cat="配置管理"]        .card::before{background:linear-gradient(90deg,#f6ad55,#ed8936)}
+[data-cat="配置管理"]        .sicon{background:#fffaf0}
+[data-cat="配置管理"]        .cbadge{background:#fffaf0;color:#c05621}
+
+[data-cat="开发工具"]        .card::before{background:linear-gradient(90deg,#b794f4,#805ad5)}
+[data-cat="开发工具"]        .sicon{background:#faf5ff}
+[data-cat="开发工具"]        .cbadge{background:#faf5ff;color:#553c9a}
+
+[data-cat="设计创作"]        .card::before{background:linear-gradient(90deg,#f6ad55,#f687b3)}
+[data-cat="设计创作"]        .sicon{background:#fff5f0}
+[data-cat="设计创作"]        .cbadge{background:#fff5f0;color:#c05621}
+
+[data-cat="快手工具"]        .card::before{background:linear-gradient(90deg,#fbb6ce,#d53f8c)}
+[data-cat="快手工具"]        .sicon{background:#fff0f6}
+[data-cat="快手工具"]        .cbadge{background:#fff0f6;color:#97266d}
+
+[data-cat="其他"]            .card::before{background:linear-gradient(90deg,#e2e8f0,#a0aec0)}
+[data-cat="其他"]            .sicon{background:#f7fafc}
+[data-cat="其他"]            .cbadge{background:#f7fafc;color:#718096}
+
+/* Loading / empty */
+.loading{text-align:center;padding:80px;color:var(--text4)}
+.spin-ring{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
+.empty{text-align:center;padding:60px;color:var(--text4)}
+.empty .ei{font-size:38px;margin-bottom:12px}
+.empty p{font-size:14px}
+
+@media(max-width:600px){
+  body{padding:22px 14px 40px}.frow{flex-direction:column}.fg{min-width:100%}.cgrid{grid-template-columns:1fr}
+  .hdr h1{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-icon">⚡</div>
+  <div>
+    <h1>Skills Dashboard</h1>
+    <p id="sub">正在加载…</p>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="pill"><span class="dot" style="background:#5a67d8"></span>共 <b id="nTotal">–</b> 个已安装 Skill</div>
+  <div class="pill"><span class="dot" style="background:#3182ce"></span>内置: <b id="nInt">–</b></div>
+  <div class="pill"><span class="dot" style="background:#6b46c1"></span>插件: <b id="nExt">–</b></div>
+  <div class="pill"><span class="dot" style="background:#38a169"></span>项目: <b id="nProj">–</b></div>
+  <button class="refresh" id="rfBtn" onclick="load(true)">
+    <svg id="rfIco" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    刷新 <span id="lastUpdate"></span>
+  </button>
+</div>
+
+<!-- Filters -->
+<div class="filters">
+  <div class="frow">
+    <div class="fg" style="flex:2;min-width:180px">
+      <label>🔍 搜索</label>
+      <div class="swrap">
+        <svg class="si" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="q" class="sw" type="text" placeholder="名称、描述、关键词…" oninput="filter()"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label>📂 分类</label>
+      <select id="fCat" class="sel" onchange="filter()">
+        <option value="">全部分类</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>🏷 来源</label>
+      <select id="fSrc" class="sel" onchange="filter()">
+        <option value="">全部来源</option>
+        <option value="internal">Internal（内置）</option>
+        <option value="extension">Extension（插件）</option>
+        <option value="project">Project（项目安装）</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>🔖 排序</label>
+      <select id="fSort" class="sel" onchange="filter()">
+        <option value="category">按分类</option>
+        <option value="name">按名称 A–Z</option>
+        <option value="source">按来源</option>
+      </select>
+    </div>
+    <button class="cbtn" onclick="clearF()">清除</button>
+  </div>
+  <div class="tagrow">
+    <span class="taglbl">快速筛选</span>
+    <button class="tag" data-t="internal" onclick="togTag(this)">🔷 内置 Internal</button>
+    <button class="tag" data-t="extension" onclick="togTag(this)">🔌 插件 Extension</button>
+    <button class="tag" data-t="project" onclick="togTag(this)">📦 项目安装</button>
+    <button class="tag" data-t="skill" onclick="togTag(this)">🗂 Skill 管理</button>
+    <button class="tag" data-t="design" onclick="togTag(this)">🎨 设计创作</button>
+    <button class="tag" data-t="config" onclick="togTag(this)">⚙️ 配置管理</button>
+    <button class="tag" data-t="dev" onclick="togTag(this)">💻 开发工具</button>
+  </div>
+</div>
+
+<!-- View bar -->
+<div class="vbar">
+  <div class="rsummary" id="rsum">显示 <strong>–</strong> 个 skill</div>
+  <div class="vtog">
+    <button class="vbtn on" id="vGrid" onclick="setView('grid')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>网格
+    </button>
+    <button class="vbtn" id="vList" onclick="setView('list')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>列表
+    </button>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="main"><div class="loading"><div class="spin-ring"></div><p>正在读取已安装 Skill…</p></div></div>
+
+</div>
+<script>
+let all = [], view = 'grid', activeTag = null;
+
+const CAT_ICON = {
+  'Skill 管理':'🗂️','产品帮助':'📚','配置管理':'⚙️','开发工具':'🔨',
+  '设计创作':'🎨','快手工具':'🦊','其他':'📦'
+};
+const CAT_ORDER = ['Skill 管理','产品帮助','配置管理','开发工具','设计创作','快手工具','其他'];
+
+const SKILL_ICON = {
+  'find-skills':'🔭','help':'📖','settings':'⚙️','skill-manager':'🗂️',
+  'cf-config-creator':'🛠️','cf-tool-create-review-update':'🔨','user-feedback-viewer':'📬',
+  'baoyu-comic':'🎭','canvas-design':'🖌️','chuti-dashi':'📝','frontend-design':'🖥️',
+  'infovis-chart-skill':'📊','ks-design-slide-deck':'🖼️','ks-kim-docs-shuttle':'🔄',
+  'theme-factory':'🎨','ui-ux-pro-max':'💎','visual-creator':'📈'
+};
+
+function esc(s){ return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+
+function kws(desc){
+  if(!desc) return [];
+  const res = new Set();
+  const p1 = /["""「]([\w\s\u4e00-\u9fff]{2,16})["""」]/g;
+  let m; while((m=p1.exec(desc))!==null){ res.add(m[1].trim()); if(res.size>=4)break; }
+  if(res.size<2){
+    const p2 = /触发词[：:]\s*([^\n.。]+)/;
+    const m2 = desc.match(p2);
+    if(m2) m2[1].split(/[,，、]/g).slice(0,3).forEach(k=>res.add(k.replace(/['"「」]/g,'').trim()));
+  }
+  return [...res].filter(k=>k.length>=2&&k.length<=16).slice(0,4);
+}
+
+function tagMatch(s, t){
+  if(!t) return true;
+  switch(t){
+    case 'internal':   return s.source==='internal';
+    case 'extension':  return s.source==='extension';
+    case 'project':    return s.source==='project';
+    case 'skill':      return s.category==='Skill 管理';
+    case 'config':     return s.category==='配置管理';
+    case 'dev':        return s.category==='开发工具';
+    case 'design':     return s.category==='设计创作';
+  }
+  return true;
+}
+
+// Static data embedded for deployment
+const STATIC_DATA = [{"id":"find-skills","name":"find-skills","version":"1.1.0","source":"internal","zh":"技能发现","summary":"搜索并安装 Agent 技能包","category":"Skill 管理","sourceLabel":"内置","description":"Helps users discover and install agent skills","updatedAt":1743053294000},{"id":"help","name":"help","version":"1.0.3","source":"internal","zh":"产品帮助","summary":"查询 CodeFlicker 功能与使用指南","category":"产品帮助","sourceLabel":"内置","description":"CodeFlicker/KwaiPilot features and usage help","updatedAt":1743053294000},{"id":"settings","name":"settings","version":"1.3.0","source":"internal","zh":"设置管理","summary":"查询/修改 CodeFlicker 配置项","category":"配置管理","sourceLabel":"内置","description":"Manage CodeFlicker extension settings","updatedAt":1743053294000},{"id":"skill-manager","name":"skill-manager","version":"1.1.0","source":"internal","zh":"Skill 管理器","summary":"创建、更新、发布、管理 Skill 生命周期","category":"Skill 管理","sourceLabel":"内置","description":"Complete skill lifecycle management","updatedAt":1743053294000},{"id":"cf-config-creator","name":"cf-config-creator","version":"1.1.0","source":"extension","zh":"配置项创建","summary":"为 KwaiPilot 新增配置项","category":"配置管理","sourceLabel":"插件","description":"Add new configurations to KwaiPilot","updatedAt":1743053294000},{"id":"cf-tool-create-review-update","name":"cf-tool-create-review-update","version":"2.0.0","source":"extension","zh":"工具开发","summary":"创建/Review/更新 Agent 工具函数","category":"开发工具","sourceLabel":"插件","description":"Create, review, and update agent tools","updatedAt":1743053294000},{"id":"user-feedback-viewer","name":"user-feedback-viewer","version":"1.7.0","source":"extension","zh":"用户反馈查看","summary":"查询反馈列表并下载分析日志","category":"产品帮助","sourceLabel":"插件","description":"View and analyze user feedback","updatedAt":1743053294000},{"id":"frontend-design","name":"frontend-design","version":"1.0.0","source":"personal","zh":"","summary":"","category":"内容创作","sourceLabel":"个人","description":"Create distinctive, production-grade frontend interfaces","updatedAt":1743053294000},{"id":"github","name":"github","version":"1.0.0","source":"personal","zh":"","summary":"","category":"其他","sourceLabel":"个人","description":"Interact with GitHub using the gh CLI","updatedAt":1743053294000},{"id":"link-find-skills","name":"link-find-skills","version":"4.2.1","source":"personal","zh":"","summary":"","category":"自进化引擎","sourceLabel":"个人","description":"技能发现 — 多源搜索 + 主动巡检","updatedAt":1743053294000}];
+
+async function load(manual){
+  const btn=document.getElementById('rfBtn');
+  btn.classList.add('spin');
+  try{
+    all = STATIC_DATA;
+    document.getElementById('nTotal').textContent = all.length;
+    document.getElementById('nInt').textContent   = all.filter(s=>s.source==='internal').length;
+    document.getElementById('nExt').textContent   = all.filter(s=>s.source==='extension').length;
+    document.getElementById('nProj').textContent  = all.filter(s=>s.source==='project').length;
+    document.getElementById('sub').textContent    = `luzifeng · 已安装 ${all.length} 个 Skill (静态版)`;
+    document.getElementById('lastUpdate').textContent = '· '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+    const catSel = document.getElementById('fCat');
+    const prev = catSel.value;
+    catSel.innerHTML = '<option value="">全部分类</option>';
+    [...new Set(all.map(s=>s.category))].sort().forEach(c=>{
+      const o = document.createElement('option');
+      o.value=c; o.textContent=(CAT_ICON[c]||'📦')+' '+c;
+      catSel.appendChild(o);
+    });
+    catSel.value = prev;
+    filter();
+  }catch(e){
+    document.getElementById('main').innerHTML=`<div class="empty"><div class="ei">⚠️</div><p>加载失败：${esc(e.message)}</p></div>`;
+  }finally{ btn.classList.remove('spin'); }
+}
+
+function filter(){
+  const q    = document.getElementById('q').value.trim().toLowerCase();
+  const cat  = document.getElementById('fCat').value;
+  const src  = document.getElementById('fSrc').value;
+  const sort = document.getElementById('fSort').value;
+
+  let list = all.filter(s=>{
+    const text = `${s.id} ${s.name} ${s.zh||''} ${s.summary||''} ${s.description||''}`.toLowerCase();
+    return (!q||text.includes(q)) && (!cat||s.category===cat) && (!src||s.source===src) && tagMatch(s,activeTag);
+  });
+
+  if(sort==='name')   list.sort((a,b)=>a.name.localeCompare(b.name));
+  if(sort==='source') list.sort((a,b)=>a.source.localeCompare(b.source));
+
+  document.getElementById('rsum').innerHTML = `显示 <strong>${list.length}</strong> / ${all.length} 个已安装 Skill`;
+  render(list, sort==='category'&&!cat);
+}
+
+function render(list, byCat){
+  const main = document.getElementById('main');
+  if(!list.length){
+    main.innerHTML='<div class="empty"><div class="ei">🔍</div><p>无匹配结果，请调整筛选条件</p></div>';
+    return;
+  }
+  if(byCat){
+    const groups={};
+    list.forEach(s=>(groups[s.category]=groups[s.category]||[]).push(s));
+    const ordered=[...CAT_ORDER.filter(c=>groups[c]),...Object.keys(groups).filter(c=>!CAT_ORDER.includes(c)).sort()];
+    main.innerHTML = ordered.map(c=>`
+      <div class="csec" data-cat="${esc(c)}">
+        <div class="chdr">
+          <span class="cbadge">${CAT_ICON[c]||'📦'} ${esc(c)}</span>
+          <span class="ccount">${groups[c].length} 个</span>
+          <div class="cdiv"></div>
+        </div>
+        <div class="${view==='list'?'clist':'cgrid'}">${groups[c].map(card).join('')}</div>
+      </div>`).join('');
+  } else {
+    main.innerHTML = `<div class="${view==='list'?'clist':'cgrid'}">${list.map(card).join('')}</div>`;
+  }
+}
+
+function card(s){
+  const icon = SKILL_ICON[s.id]||'📦';
+  const kwArr = kws(s.description);
+  const nameStr = s.zh
+    ? `<span class="sname">${esc(s.id)}</span> <span class="sname-zh">（${esc(s.zh)}）</span>`
+    : `<span class="sname">${esc(s.id)}</span>`;
+
+  return `
+  <div class="card" data-cat="${esc(s.category)}">
+    <div class="ctop">
+      <div class="sicon">${icon}</div>
+      <div class="smeta">
+        <div>${nameStr}</div>
+        <div class="sid">${esc(s.sourceLabel)} · v${esc(s.version||'?')}</div>
+      </div>
+    </div>
+    <div class="cbody">
+      ${s.summary?`<div class="skill-summary">${esc(s.summary)}</div>`:''}
+      <div class="skill-desc" title="${esc(s.description)}">${esc(s.description)||'<em style="color:#a0aec0">暂无描述</em>'}</div>
+      ${kwArr.length?`<div class="kws">${kwArr.map(k=>`<span class="kw">${esc(k)}</span>`).join('')}</div>`:''}
+    </div>
+    <div class="cfoot">
+      <span class="srcbadge src-${s.source}">${esc(s.sourceLabel)}</span>
+      <span class="cbadge" style="font-size:10px;padding:2px 7px">${CAT_ICON[s.category]||'📦'} ${esc(s.category)}</span>
+    </div>
+  </div>`;
+}
+
+function setView(v){
+  view=v;
+  document.getElementById('vGrid').classList.toggle('on',v==='grid');
+  document.getElementById('vList').classList.toggle('on',v==='list');
+  filter();
+}
+
+function togTag(btn){
+  const t=btn.dataset.t;
+  if(activeTag===t){ activeTag=null; btn.classList.remove('on'); }
+  else{ document.querySelectorAll('.tag').forEach(b=>b.classList.remove('on')); activeTag=t; btn.classList.add('on'); }
+  filter();
+}
+
+function clearF(){
+  document.getElementById('q').value='';
+  document.getElementById('fCat').value='';
+  document.getElementById('fSrc').value='';
+  document.getElementById('fSort').value='category';
+  document.querySelectorAll('.tag').forEach(b=>b.classList.remove('on'));
+  activeTag=null;
+  filter();
+}
+
+load();
+setInterval(()=>load(), 30000);
+</script>
+</body>
+</html>
