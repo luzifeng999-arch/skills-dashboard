@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Design AI 成品能力全景图</title>
+<style>
+/*
+  ┌─────────────────────────────────────────┐
+  │  4-LEVEL GRAY HIERARCHY DESIGN SYSTEM   │
+  │  L1 Header   → #111  (black)  / white   │
+  │  L2 Section  → #333  (dark)   / white   │
+  │  L3 Column   → #F4F4F4 (light) / #111   │
+  │  L4 Item     → #FFFFFF (white) / #222   │
+  └─────────────────────────────────────────┘
+*/
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+  background: #DADADA;
+  padding: 32px;
+  color: #111;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 1560px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1.5px solid #111;
+  box-shadow: 4px 4px 0 #999;
+}
+
+/* ─── L1: 顶部标题 ─── */
+.page-title {
+  background: #111;
+  color: #fff;
+  text-align: center;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  border-bottom: none;
+}
+
+/* ─── 对内/对外 标识行 ─── */
+.audience-row {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  border-bottom: 1.5px solid #111;
+}
+.aud {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #F4F4F4;
+  color: #333;
+}
+.aud.in { border-right: 1.5px solid #111; }
+.aud-badge {
+  display: inline-block;
+  padding: 2px 9px;
+  background: #111;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  flex-shrink: 0;
+}
+
+/* ─── 主体：左内右外 ─── */
+.main-split {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  border-bottom: 1.5px solid #111;
+}
+.zone-i { border-right: 1.5px solid #111; }
+
+/* ─── L2: 成品能力大类列标题 ─── */
+.cap-cols {
+  display: grid;
+  grid-template-columns: 2.5fr 1.4fr 1.4fr 1.3fr;
+  height: 100%;
+}
+.cap-col {
+  border-right: 1px solid #D0D0D0;
+  display: flex;
+  flex-direction: column;
+}
+.cap-col:last-child { border-right: none; }
+
+.col-hdr {
+  text-align: center;
+  padding: 8px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #333;
+  color: #fff;
+  border-bottom: 1px solid #222;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+/* ─── L4: 叶子标签 ─── */
+.leaf-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px 8px;
+  gap: 5px;
+  align-content: flex-start;
+  flex: 1;
+}
+.tag {
+  background: #fff;
+  border: 1px solid #CFCFCF;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  color: #222;
+  white-space: nowrap;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: border-color .1s, background .1s;
+}
+.tag:hover { border-color: #888; background: #F8F8F8; }
+
+/* 对外叶子 — 稍微区分：用浅灰底 */
+.tag-ex {
+  background: #F7F7F7;
+  border: 1px solid #CFCFCF;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  color: #222;
+  white-space: nowrap;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: border-color .1s, background .1s;
+}
+.tag-ex:hover { border-color: #888; background: #ECECEC; }
+
+/* 对外能力列 */
+.ecap-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+}
+.ecap-col {
+  border-right: 1px solid #D0D0D0;
+  display: flex;
+  flex-direction: column;
+}
+.ecap-col:last-child { border-right: none; }
+
+/* ─── 工程层 ─── */
+.infra-wrap { border-bottom: 1.5px solid #111; }
+
+.infra-l1 {
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  background: #222;
+  color: #fff;
+  border-bottom: 1px solid #111;
+  letter-spacing: .06em;
+}
+
+.infra-cols {
+  display: grid;
+  grid-template-columns: 22fr 42fr 22fr;
+}
+.infra-grp { border-right: 1.5px solid #999; }
+.infra-grp:last-child { border-right: none; }
+
+/* L2: 工程大组 */
+.infra-l2 {
+  text-align: center;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #444;
+  color: #fff;
+  border-bottom: 1px solid #333;
+}
+
+.sub-cols { display: grid; }
+.sub-col {
+  border-right: 1px solid #DEDEDE;
+  display: flex;
+  flex-direction: column;
+}
+.sub-col:last-child { border-right: none; }
+
+/* L3: 子列标题 */
+.sub-l3 {
+  text-align: center;
+  padding: 5px 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  background: #F4F4F4;
+  border-bottom: 1px solid #DEDEDE;
+  letter-spacing: .01em;
+}
+/* Skill 列特殊处理：反色突出 */
+.sub-l3.skill {
+  background: #111;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* L4: 子项 */
+.sub-items {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 5px;
+  flex: 1;
+}
+.sitem {
+  text-align: center;
+  font-size: 11px;
+  color: #333;
+  padding: 4px 5px;
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  line-height: 1.4;
+  transition: background .1s;
+}
+.sitem:hover { background: #F4F4F4; }
+
+/* 新增 Skill — 仅用黑底白字区分，不加其他颜色 */
+.sitem.new {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+  font-weight: 600;
+}
+.sitem.new::after {
+  content: ' ✦';
+  font-size: 8px;
+  color: #aaa;
+}
+
+/* ─── 图例 ─── */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 9px 18px;
+  background: #F4F4F4;
+  border-top: 1px solid #CFCFCF;
+  font-size: 11.5px;
+  color: #555;
+}
+.legend strong { color: #111; font-weight: 700; margin-right: 4px; }
+.li { display: flex; align-items: center; gap: 6px; }
+.ld { width: 13px; height: 13px; border: 1px solid #999; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- L1 标题 -->
+  <div class="page-title">DESIGN AI（POIFY） · 成品能力全景图</div>
+
+  <!-- 对内/对外标识行 -->
+  <div class="audience-row">
+    <div class="aud in">
+      <span class="aud-badge">对内</span>
+      服务公司内部业务团队 · 主站 / 商业化 / 电商 / 本地生活 / 海外 / 效率工程 / 研发线
+    </div>
+    <div class="aud">
+      <span class="aud-badge">对外</span>
+      通过 API / SDK 向外部商业客户输出服务能力
+    </div>
+  </div>
+
+  <!-- 主体 -->
+  <div class="main-split">
+
+    <!-- 对内 -->
+    <div class="zone-i">
+      <div class="cap-cols">
+
+        <div class="cap-col">
+          <div class="col-hdr">定制图像生成 / 编辑</div>
+          <div class="leaf-wrap">
+            <span class="tag">文生图</span>
+            <span class="tag">图生图</span>
+            <span class="tag">风格迁移</span>
+            <span class="tag">换脸</span>
+            <span class="tag">面部嵌入</span>
+            <span class="tag">抠图</span>
+            <span class="tag">扩图</span>
+            <span class="tag">局部重绘</span>
+            <span class="tag">内容消除</span>
+            <span class="tag">图片放大</span>
+            <span class="tag">高清化</span>
+            <span class="tag">去水印</span>
+            <span class="tag">换背景</span>
+          </div>
+        </div>
+
+        <div class="cap-col">
+          <div class="col-hdr">定制动态图像 / 视频</div>
+          <div class="leaf-wrap">
+            <span class="tag">文生视频</span>
+            <span class="tag">图生视频</span>
+            <span class="tag">动态头图</span>
+            <span class="tag">动态素材</span>
+          </div>
+        </div>
+
+        <div class="cap-col">
+          <div class="col-hdr">智能运营</div>
+          <div class="leaf-wrap">
+            <span class="tag">运营多尺寸</span>
+            <span class="tag">海报生成</span>
+            <span class="tag">贴纸生成</span>
+            <span class="tag">素材批量替换</span>
+          </div>
+        </div>
+
+        <div class="cap-col">
+          <div class="col-hdr">UI / 网页生成</div>
+          <div class="leaf-wrap">
+            <span class="tag">活动页面</span>
+            <span class="tag">Banner 生成</span>
+            <span class="tag">海外 Banner</span>
+            <span class="tag">3D 场景生成</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 对外 -->
+    <div class="zone-e">
+      <div class="ecap-cols">
+
+        <div class="ecap-col">
+          <div class="col-hdr">电商能力</div>
+          <div class="leaf-wrap">
+            <span class="tag-ex">白底图</span>
+            <span class="tag-ex">商品精修</span>
+            <span class="tag-ex">模特换衣</span>
+            <span class="tag-ex">电商卖点</span>
+            <span class="tag-ex">店铺装修</span>
+            <span class="tag-ex">智能配色</span>
+          </div>
+        </div>
+
+        <div class="ecap-col">
+          <div class="col-hdr">API 能力输出</div>
+          <div class="leaf-wrap">
+            <span class="tag-ex">图像生成 API</span>
+            <span class="tag-ex">图像编辑 API</span>
+            <span class="tag-ex">工具类 API</span>
+            <span class="tag-ex">业务定制 API</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- end main-split -->
+
+  <!-- 工程层 -->
+  <div class="infra-wrap">
+    <div class="infra-l1">基础工程能力</div>
+    <div class="infra-cols">
+
+      <div class="infra-grp">
+        <div class="infra-l2">工作流部署</div>
+        <div class="sub-cols" style="grid-template-columns:1fr 1fr">
+          <div class="sub-col">
+            <div class="sub-l3">ComfyUI</div>
+            <div class="sub-items">
+              <span class="sitem">工作流部署</span>
+              <span class="sitem">工作流定制</span>
+              <span class="sitem">工作流加速</span>
+              <span class="sitem">插件管理</span>
+              <span class="sitem">插件开发</span>
+            </div>
+          </div>
+          <div class="sub-col">
+            <div class="sub-l3">Agent</div>
+            <div class="sub-items">
+              <span class="sitem">MCP</span>
+              <span class="sitem">LLM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="infra-grp">
+        <div class="infra-l2">工程能力</div>
+        <div class="sub-cols" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr">
+          <div class="sub-col">
+            <div class="sub-l3">绘图引擎</div>
+            <div class="sub-items">
+              <span class="sitem">自动布局</span>
+              <span class="sitem">字体渲染</span>
+              <span class="sitem">图片渲染</span>
+              <span class="sitem">多图层合并</span>
+            </div>
+          </div>
+          <div class="sub-col">
+            <div class="sub-l3">系统管理</div>
+            <div class="sub-items">
+              <span class="sitem">API 接入</span>
+              <span class="sitem">弹性扩容</span>
+            </div>
+          </div>
+          <div class="sub-col">
+            <div class="sub-l3">安全审核</div>
+            <div class="sub-items">
+              <span class="sitem">Prompt 校验</span>
+              <span class="sitem">结果校验</span>
+            </div>
+          </div>
+          <div class="sub-col">
+            <div class="sub-l3">图像工程</div>
+            <div class="sub-items">
+              <span class="sitem">画布 / 布局</span>
+              <span class="sitem">图像工程</span>
+            </div>
+          </div>
+          <div class="sub-col">
+            <div class="sub-l3 skill">Skill ✦</div>
+            <div class="sub-items">
+              <span class="sitem new">信息图生成</span>
+              <span class="sitem new">漫画生成</span>
+              <span class="sitem new">PPT 生成</span>
+              <span class="sitem new">图表生成</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="infra-grp">
+        <div class="infra-l2">用户界面 SDK</div>
+        <div class="sub-cols" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="sub-col">
+            <div class="sub-l3">生成 UI</div>
+            <div class="sub-items">
+              <span class="sitem">智能生成</span>
+              <span class="sitem">智能应用</span>
+            </div>
+          </div>
+          <div class="sub-col">
+            <div class="sub-l3">编辑器 UI</div>
+            <div class="sub-items">
+              <span class="sitem">运营模板</span>
+              <span class="sitem">编辑器画布</span>
+            </div>
+          </div>
+          <div class="sub-col">
+            <div class="sub-l3">设计 Agent</div>
+            <div class="sub-items">
+              <span class="sitem">KIKO Agent</span>
+              <span class="sitem">智能运营</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- end infra-wrap -->
+
+  <!-- 图例 -->
+  <div class="legend">
+    <strong>图例</strong>
+    <div class="li">
+      <div class="ld" style="background:#fff"></div>对内服务
+    </div>
+    <div class="li">
+      <div class="ld" style="background:#F7F7F7"></div>对外服务
+    </div>
+    <div class="li">
+      <div class="ld" style="background:#111;border-color:#111"></div>✦ 新增 Skill
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
