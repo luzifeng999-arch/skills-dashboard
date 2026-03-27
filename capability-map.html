@@ -53,7 +53,21 @@ body {
 .scene-cell:last-child { border-right: none; }
 
 /* ════════════════════════════
-   L2  定制化开发层（中间层）
+   L2  定制化开发（独立全宽标题行）
+   ════════════════════════════ */
+.dev-label {
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  background: #333;
+  color: #fff;
+  border-bottom: 1px solid #D0D0D0;
+  letter-spacing: .08em;
+}
+
+/* ════════════════════════════
+   L3  开发类别列
    ════════════════════════════ */
 .dev-row {
   display: grid;
@@ -191,17 +205,20 @@ body {
 <body>
 <div class="page">
 
-  <!-- ── L1：场景层 ── -->
+  <!-- ── L1：AIGC 应用场景 ── -->
   <div class="scene-row">
-    <div class="scene-cell">主站</div>
-    <div class="scene-cell">商业化</div>
-    <div class="scene-cell">电商</div>
-    <div class="scene-cell">本地生活</div>
-    <div class="scene-cell">海外</div>
-    <div class="scene-cell">API 对外</div>
+    <div class="scene-cell">图片创作</div>
+    <div class="scene-cell">视频 / 动态图像</div>
+    <div class="scene-cell">电商物料</div>
+    <div class="scene-cell">广告素材</div>
+    <div class="scene-cell">智能运营</div>
+    <div class="scene-cell">API 能力输出</div>
   </div>
 
-  <!-- ── L2：定制化开发 + L3/L4：具体能力 ── -->
+  <!-- ── L2：定制化开发（独立全宽标题行） ── -->
+  <div class="dev-label">定制化开发</div>
+
+  <!-- ── L3/L4：具体开发类别 + 能力 ── -->
   <div class="dev-row">
 
     <div class="dev-col">
@@ -373,7 +390,7 @@ body {
   <!-- 图例 -->
   <div class="legend">
     <strong>图例</strong>
-    <div class="li"><div class="ld" style="background:#111;border-color:#111"></div>L1 场景</div>
+    <div class="li"><div class="ld" style="background:#111;border-color:#111"></div>L1 AIGC 应用场景</div>
     <div class="li"><div class="ld" style="background:#333;border-color:#333"></div>L2 定制化开发</div>
     <div class="li"><div class="ld" style="background:#fff"></div>L3 具体能力</div>
     <div class="li"><div class="ld" style="background:#111;border-color:#111"></div>✦ 新增 Skill</div>
